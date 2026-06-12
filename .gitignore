@@ -12,7 +12,9 @@ $RECYCLE.BIN/
 *.suo
 *.user
 
-# Node (para cuando llegue el MCP)
+# Node / MCP
 node_modules/
 dist/
+bin/
 .env
+package-lock.json
