@@ -126,6 +126,12 @@ SerialOrEntity = number | GameObject | SerialObject
 SerialObject   = { serial: number }
 ```
 
+Los tipos `Mobile` e `Item` tienen un campo discriminante `_tag` para narrowing de tipo:
+- `Mobile._tag === 'Mobile'`
+- `Item._tag === 'Item'`
+
+Util cuando una funcion devuelve `Item | Mobile` y necesitas tratar cada caso de forma diferente.
+
 NOTA: Para `mana`, `maxMana`, `stamina`, `maxStamina`: en el jugador devuelven el valor real; en otros mobiles devuelven una escala de 1 a 100.
 
 ---
@@ -242,7 +248,7 @@ player.salute(): void
 ### Metodos — Skills
 
 ```ts
-player.getSkill(skill: Skills): { value: number, base: number, cap: number, lock: SkillLock, index: number, canBeUsable: boolean } | undefined
+player.getSkill(skill: Skills): { value: number, base: number, cap: number, lock: SkillLock, index: number, name: string, canBeUsable: boolean } | undefined
 player.getAllSkills(): object[] | undefined
 player.setSkillLock(skill: Skills, lock: SkillLock): void
 ```
@@ -292,8 +298,16 @@ client.sysMsg(message: string, hue?: number): void
 ### Informacion de items
 
 ```ts
-client.queryItemOPL(serial: SerialOrEntity, timeout?: number): object
-// Devuelve: { name, properties, amount, graphic, hue, ... }
+client.queryItemOPL(serial: SerialOrEntity, timeout?: number): {
+  name: string;
+  properties: object[] | null;
+  data: string | null;
+  amount: number;
+  graphic: number;
+  hue: number;
+  isPartialHue: boolean;
+  serial: number;
+}
 client.queryItemSingleClickName(serial: SerialOrEntity, timeout?: number): string
 ```
 
@@ -521,12 +535,17 @@ ignoreList.replace(values: number[]): void
 
 Los seriales en `ignoreList` son excluidos de los resultados de `client.findType` y metodos relacionados. Util para iterar todos los items de un tipo sin repetir.
 
+NOTA CRITICA: La `ignoreList` persiste entre scripts (cross-script). Siempre llamar `ignoreList.clear()` al final de la iteracion para no contaminar scripts posteriores o el propio bucle principal.
+
+`ignoreList.add()` devuelve `true` si el serial fue anadido, `false` si ya existia. `ignoreList.remove()` devuelve `true` si fue eliminado, `false` si no existia.
+
 ---
 
 ## popupMenu
 
 ```ts
 popupMenu.exists: boolean
+popupMenu.content: any                                           // contenido del menu si esta abierto
 popupMenu.request(serial: number, waitMs?: number): boolean | undefined
 popupMenu.waitUntilOpen(timeoutMs?: number): boolean
 popupMenu.waitForContent(timeoutMs?: number): object | null
@@ -561,7 +580,22 @@ worldMap.removeAllMarkers(): void
 worldMap.parseLocation(input: string): object | undefined
 ```
 
-`parseLocation` soporta coordenadas sextante y otros formatos de texto de ubicacion del juego.
+`parseLocation` soporta coordenadas sextante. Ejemplo de formato: `"100o25'S,40o04'E"`.
+
+### WorldMapMarker — interfaz
+
+```ts
+interface WorldMapMarker {
+  name: string;
+  color: string;      // nombre de color, ej: "green", "blue"
+  x: number;
+  y: number;
+  mapId: number;      // indice del mapa
+  zoomLevel: number;  // nivel de zoom minimo para mostrar el marcador
+}
+```
+
+`WorldMapMarkerPartial` permite `color`, `mapId` y `zoomLevel` como opcionales; `name`, `x`, `y` son obligatorios.
 
 ---
 
