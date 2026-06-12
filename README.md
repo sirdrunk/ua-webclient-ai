@@ -14,7 +14,7 @@ Los macros se escriben en TypeScript y se ejecutan directamente en Chrome. La AP
 
 ### `context-pack/`
 
-Dos archivos markdown listos para pegar como contexto en cualquier IA (ChatGPT, Claude, Gemini, Copilot...).
+Archivos markdown listos para pegar como contexto en cualquier IA (ChatGPT, Claude, Gemini, Copilot...).
 
 #### `classicuo-scripting-context.md` — obligatorio
 
@@ -24,13 +24,26 @@ Toda la API de scripting de ClassicUO: variables globales, tipos, métodos, enum
 
 Guía de buenas prácticas para macros robustos y eficientes: cómo estructurar bucles, cuándo usar búsquedas de cliente vs comandos de servidor, cómo evitar que el macro consuma recursos del juego, y más. Pégalo junto al context pack para que la IA aplique estas prácticas automáticamente al generar código.
 
+### `context-pack/ua/` — específico de Ultima Alianza
+
+Recursos adicionales exclusivos del servidor Ultima Alianza. Combínalos con los archivos anteriores para que la IA conozca los comandos y patrones propios de UA.
+
+#### `ua/ua-commands.md`
+
+Referencia completa de comandos del servidor UA: comandos de punto (`.vendas`, `.cast N`, `.vida`, `.nigro N`...), comandos de voz (mascotas, NPCs, barcos, casas) y la distinción entre ambos tipos. Incluye todos los hechizos de mago, nigromante, bardo y paladín con su número de comando.
+
+#### `ua/ua-examples.md`
+
+12 macros reales anotados de jugadores de UA y la comunidad ClassicUO. Cubren los patrones más comunes: bucle de curación, detección de estado, avisos PvP, loot, montura, escape, entrenamiento de skill, domado de animales. Los antipatrones presentes están marcados con comentarios para que la IA los evite al generar código nuevo.
+
 **Cómo usarlo:**
 
 1. Abre `context-pack/classicuo-scripting-context.md`
 2. Copia el contenido
 3. Pégalo como primer mensaje o system prompt en tu IA favorita
-4. Opcionalmente, añade también el contenido de `context-pack/best-practices.md` para obtener macros más robustos
-5. A partir de ahí, la IA conoce la API completa y puede ayudarte a escribir macros correctamente
+4. Opcionalmente, añade `context-pack/best-practices.md` para obtener macros más robustos
+5. Si juegas en Ultima Alianza, añade también `context-pack/ua/ua-commands.md` y `context-pack/ua/ua-examples.md`
+6. A partir de ahí, la IA conoce la API completa y los comandos de UA y puede ayudarte a escribir macros correctamente
 
 ## Fuente de la documentación
 
