@@ -484,6 +484,7 @@ Gump.lastVendorSellData: object | undefined
 Gump.findOrWait(serialOrText: string | number, timeoutMs?: number, fromServer?: boolean): Gump | undefined
 Gump.exists(serial: number): boolean
 Gump.closeAll(): void
+Gump.waitForVendorGumpData(timeoutMs?: number): object | undefined
 ```
 
 `findOrWait` busca un gump por su serial numerico o por texto contenido. El timeout por defecto es 5000 ms. `fromServer: false` busca gumps locales (no de servidor).
@@ -504,6 +505,7 @@ gump.hasButton(id: number): boolean
 gump.setTextEntry(localSerial: number, value: string): void
 gump.setCheckbox(serial: number, value: boolean): void
 gump.horizontalMenuSelect(graphic: number, hue?: number): void
+gump.switchPage(page: number): void
 gump.close(): void
 ```
 
