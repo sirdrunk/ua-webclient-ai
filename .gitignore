@@ -1,18 +1,18 @@
-# Build and Release Folders
-bin-debug/
-bin-release/
-[Oo]bj/
-[Bb]in/
+# Macros personales
+*.js.txt
 
-# Other files and folders
-.settings/
+# Windows
+Thumbs.db
+desktop.ini
+$RECYCLE.BIN/
 
-# Executables
-*.swf
-*.air
-*.ipa
-*.apk
+# Editors
+.vscode/
+.idea/
+*.suo
+*.user
 
-# Project files, i.e. `.project`, `.actionScriptProperties` and `.flexProperties`
-# should NOT be excluded as they contain compiler settings and other important
-# information for Eclipse / Flash Builder.
+# Node (para cuando llegue el MCP)
+node_modules/
+dist/
+.env
