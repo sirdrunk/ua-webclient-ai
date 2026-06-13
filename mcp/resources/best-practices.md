@@ -457,6 +457,56 @@ Este patron es aplicable a cualquier macro que añada items al inventario:
 
 ---
 
+## 13. Items con grafico compartido — distinguir variantes por hue
+
+En UO muchos items comparten el mismo grafico (`graphic`) pero se diferencian por el color (`hue`). Los casos mas comunes en UA:
+
+- **Pociones** — todas usan el grafico `0xF0E` (frasco). El hue identifica el tipo: 63 = Agilidad, 28 = Antidoto, 12 = Explosion, etc.
+- **Armaduras de distintos metales** — un `i_platemail_chest` de hierro y uno de oro comparten grafico; el hue indica el material.
+- **Armaduras de cuero/escamas** — igual: mismo grafico, hue distinto segun el tipo de cuero o escama.
+
+### Buscar por grafico y hue especifico
+
+Cuando el macro necesita un tipo concreto, pasar el hue como segundo argumento de `findType`:
+
+```ts
+// Solo pociones de Antidoto (hue 28)
+const antidoto = client.findType(0xF0E, 28, player.backpack);
+
+// Solo pociones de Curacion Mejorada (hue 21)
+const curacion = client.findType(0xF0E, 21, player.backpack);
+```
+
+### Buscar cualquier variante del grafico
+
+Pasar `null` como hue para encontrar el item independientemente del color:
+
+```ts
+// Cualquier pocion, sea del tipo que sea
+const cualquierPocion = client.findType(0xF0E, null, player.backpack);
+```
+
+### Comprobar el hue de un item encontrado
+
+Si el macro necesita reaccionar de forma distinta segun la variante, leer la propiedad `.hue` del item:
+
+```ts
+const item = client.findType(0xF0E, null, player.backpack);
+if (item) {
+  if (item.hue === 28) {
+    client.headMsg('Es un antidoto', player, 68);
+  } else if (item.hue === 21) {
+    client.headMsg('Es una pocion de curacion', player, 68);
+  } else {
+    client.headMsg('Pocion desconocida, hue: ' + item.hue, player, 53);
+  }
+}
+```
+
+Este mismo patron aplica a armaduras: encontrar una pieza con `findType` y comprobar `.hue` para saber si es de hierro, oro, escamas de dragon, etc., antes de equiparla o descartarla.
+
+---
+
 ## 12. Incluir siempre una condicion de salida
 
 Una macro sin condicion de salida ante recursos agotados entra en un bucle infinito intentando una accion imposible, generando carga innecesaria en el cliente y potencialmente en el servidor.

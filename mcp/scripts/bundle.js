@@ -7,8 +7,11 @@ const resourcesDir = path.join(__dirname, '..', 'resources');
 const define = {
   __API_CONTENT__:           JSON.stringify(fs.readFileSync(path.join(resourcesDir, 'classicuo-scripting-context.md'), 'utf-8')),
   __BEST_PRACTICES_CONTENT__: JSON.stringify(fs.readFileSync(path.join(resourcesDir, 'best-practices.md'), 'utf-8')),
-  __UA_COMMANDS_CONTENT__:   JSON.stringify(fs.readFileSync(path.join(resourcesDir, 'ua-commands.md'), 'utf-8')),
-  __UA_EXAMPLES_CONTENT__:   JSON.stringify(fs.readFileSync(path.join(resourcesDir, 'ua-examples.md'), 'utf-8')),
+  __UA_COMMANDS_CONTENT__:        JSON.stringify(fs.readFileSync(path.join(resourcesDir, 'ua-commands.md'), 'utf-8')),
+  __UA_EXAMPLES_CONTENT__:        JSON.stringify(fs.readFileSync(path.join(resourcesDir, 'ua-examples.md'), 'utf-8')),
+  __UA_NPCS_CONTENT__:            JSON.stringify(fs.readFileSync(path.join(resourcesDir, 'ua-npcs.md'), 'utf-8')),
+  __UA_CRAFTING_ITEMS_CONTENT__:  JSON.stringify(fs.readFileSync(path.join(resourcesDir, 'ua-crafting-items.md'), 'utf-8')),
+  __UA_COLORS_CONTENT__:          JSON.stringify(fs.readFileSync(path.join(resourcesDir, 'colores_importantes_ua.md'), 'utf-8')),
 };
 
 esbuild.buildSync({

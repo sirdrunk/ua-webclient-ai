@@ -11,6 +11,9 @@ declare const __API_CONTENT__: string | undefined;
 declare const __BEST_PRACTICES_CONTENT__: string | undefined;
 declare const __UA_COMMANDS_CONTENT__: string | undefined;
 declare const __UA_EXAMPLES_CONTENT__: string | undefined;
+declare const __UA_NPCS_CONTENT__: string | undefined;
+declare const __UA_CRAFTING_ITEMS_CONTENT__: string | undefined;
+declare const __UA_COLORS_CONTENT__: string | undefined;
 
 function loadResource(filename: string, embedded: string | undefined): string {
   if (embedded !== undefined) return embedded;
@@ -42,10 +45,28 @@ const RESOURCES = [
     description: '12 macros reales anotados de jugadores de UA. Cubren bucle de curación, detección de estado, avisos PvP, loot, entrenamiento de skill, domado y más.',
     content: () => loadResource('ua-examples.md', typeof __UA_EXAMPLES_CONTENT__ !== 'undefined' ? __UA_EXAMPLES_CONTENT__ : undefined),
   },
+  {
+    uri: 'classicuo://ua-npcs',
+    name: 'Ultima Alianza — NPCs del servidor',
+    description: '497 NPCs de UA con nombre, gráfico hex y decimal. Útil para macros de combat, taming o identificación de criaturas.',
+    content: () => loadResource('ua-npcs.md', typeof __UA_NPCS_CONTENT__ !== 'undefined' ? __UA_NPCS_CONTENT__ : undefined),
+  },
+  {
+    uri: 'classicuo://ua-crafting-items',
+    name: 'Ultima Alianza — Items crafteables',
+    description: 'Items crafteables de UA con gráfico hex: herrería, sastrería, carpintería, alquimia, arquería, inscripción, tinkering, pociones, reagentes y armaduras de escamas.',
+    content: () => loadResource('ua-crafting-items.md', typeof __UA_CRAFTING_ITEMS_CONTENT__ !== 'undefined' ? __UA_CRAFTING_ITEMS_CONTENT__ : undefined),
+  },
+  {
+    uri: 'classicuo://ua-colors',
+    name: 'Ultima Alianza — Colores importantes',
+    description: 'Hues de referencia para scripting: metales/ores (mismo hue para ore, lingote y armadura), armas slayer y tintes de temporada (tub).',
+    content: () => loadResource('colores_importantes_ua.md', typeof __UA_COLORS_CONTENT__ !== 'undefined' ? __UA_COLORS_CONTENT__ : undefined),
+  },
 ];
 
 const server = new Server(
-  { name: 'classicuo-ua-mcp', version: '1.0.0' },
+  { name: 'classicuo-ua-mcp', version: '1.1.0' },
   { capabilities: { resources: {} } }
 );
 

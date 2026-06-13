@@ -164,7 +164,9 @@ Una vez configurado, el servidor expone estos recursos que la IA puede consultar
 | `classicuo://best-practices` | Guía de buenas prácticas para macros robustos |
 | `classicuo://ua-commands` | Comandos del servidor Ultima Alianza |
 | `classicuo://ua-examples` | 12 macros reales anotados de jugadores de UA |
-| `classicuo://ua-npcs` | 497 NPCs del servidor con gráfico, hex y decimal *(próximamente en v1.1.0)* |
+| `classicuo://ua-npcs` | 497 NPCs del servidor con nombre, gráfico hex y decimal |
+| `classicuo://ua-crafting-items` | Items crafteables con gráfico y hue: herrería, sastrería, alquimia, pociones, reagentes, armaduras de escamas y más |
+| `classicuo://ua-colors` | Hues de referencia: metales/ores, armas slayer y tintes de temporada |
 
 ---
 

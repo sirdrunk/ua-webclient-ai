@@ -40,7 +40,19 @@ setTimeout(() => {
   send({ jsonrpc: '2.0', id: 6, method: 'resources/read', params: { uri: 'classicuo://ua-examples' } });
 }, 3200);
 
-// 7. Evaluar
+setTimeout(() => {
+  send({ jsonrpc: '2.0', id: 7, method: 'resources/read', params: { uri: 'classicuo://ua-npcs' } });
+}, 3800);
+
+setTimeout(() => {
+  send({ jsonrpc: '2.0', id: 8, method: 'resources/read', params: { uri: 'classicuo://ua-crafting-items' } });
+}, 4400);
+
+setTimeout(() => {
+  send({ jsonrpc: '2.0', id: 9, method: 'resources/read', params: { uri: 'classicuo://ua-colors' } });
+}, 5000);
+
+// 10. Evaluar
 setTimeout(() => {
   const checks = [
     // Handshake
@@ -50,11 +62,17 @@ setTimeout(() => {
     { text: 'classicuo://best-practices',             desc: 'URI best-practices listada' },
     { text: 'classicuo://ua-commands',                desc: 'URI ua-commands listada' },
     { text: 'classicuo://ua-examples',                desc: 'URI ua-examples listada' },
+    { text: 'classicuo://ua-npcs',                    desc: 'URI ua-npcs listada' },
+    { text: 'classicuo://ua-crafting-items',          desc: 'URI ua-crafting-items listada' },
+    { text: 'classicuo://ua-colors',                  desc: 'URI ua-colors listada' },
     // Contenido embebido de cada recurso
     { text: 'variables globales',                     desc: 'Contenido de classicuo://api embebido' },
     { text: 'Intervalos de sleep recomendados',       desc: 'Contenido de classicuo://best-practices embebido' },
     { text: "player.say('.vendas')",                  desc: 'Contenido de classicuo://ua-commands embebido' },
     { text: 'Auto-curación con vendas',               desc: 'Contenido de classicuo://ua-examples embebido' },
+    { text: 'Gallina',                                desc: 'Contenido de classicuo://ua-npcs embebido' },
+    { text: 'ITEMS - HERRERIA',                       desc: 'Contenido de classicuo://ua-crafting-items embebido' },
+    { text: 'color_o_valorite',                       desc: 'Contenido de classicuo://ua-colors embebido' },
   ];
 
   console.log('\n── Validación del .exe ──');
@@ -68,4 +86,4 @@ setTimeout(() => {
   console.log(`\n${ok ? 'OK' : 'FALLIDO'} — ${checks.filter(c => fullResponse.includes(c.text)).length}/${checks.length} checks`);
   proc.kill();
   process.exit(ok ? 0 : 1);
-}, 5000);
+}, 7000);
