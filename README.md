@@ -55,11 +55,19 @@ En lugar de copiar y pegar los archivos manualmente, el **MCP server** los inyec
 
 La IA tendrá disponibles los 4 recursos en cuanto arranque la sesión, sin que el usuario tenga que hacer nada más.
 
-### Descarga
+### Instalación
+
+#### Opción A — Ejecutable (sin Node.js)
 
 Descarga `classicuo-ua-mcp.exe` desde la sección [Releases](https://github.com/sirdrunk/ua-webclient-ai/releases) y ponlo en una carpeta permanente (por ejemplo `C:\UA\mcp\`).
 
 No requiere instalar Node.js ni ninguna dependencia.
+
+#### Opción B — npx (requiere Node.js)
+
+```
+npx classicuo-ua-mcp
+```
 
 ### Configuración
 
@@ -72,6 +80,19 @@ Edita `%APPDATA%\Claude\claude_desktop_config.json`:
   "mcpServers": {
     "classicuo-ua": {
       "command": "C:/UA/mcp/classicuo-ua-mcp.exe"
+    }
+  }
+}
+```
+
+Con npx:
+
+```json
+{
+  "mcpServers": {
+    "classicuo-ua": {
+      "command": "npx",
+      "args": ["classicuo-ua-mcp"]
     }
   }
 }
@@ -91,6 +112,19 @@ Edita `%APPDATA%\Cursor\User\globalStorage\roamingSettings.json` o ve a *Setting
 }
 ```
 
+Con npx:
+
+```json
+{
+  "mcpServers": {
+    "classicuo-ua": {
+      "command": "npx",
+      "args": ["classicuo-ua-mcp"]
+    }
+  }
+}
+```
+
 #### Windsurf
 
 Edita `%APPDATA%\Windsurf\User\globalStorage\roamingSettings.json` o ve a *Settings → MCP*:
@@ -105,7 +139,20 @@ Edita `%APPDATA%\Windsurf\User\globalStorage\roamingSettings.json` o ve a *Setti
 }
 ```
 
-> Cambia `C:/UA/mcp/classicuo-ua-mcp.exe` por la ruta donde hayas guardado el ejecutable. Usa barras `/` en lugar de `\`.
+Con npx:
+
+```json
+{
+  "mcpServers": {
+    "classicuo-ua": {
+      "command": "npx",
+      "args": ["classicuo-ua-mcp"]
+    }
+  }
+}
+```
+
+> Para el `.exe`: cambia `C:/UA/mcp/classicuo-ua-mcp.exe` por la ruta donde hayas guardado el ejecutable. Usa barras `/` en lugar de `\`.
 
 ### Recursos disponibles
 
