@@ -45,6 +45,81 @@ Referencia completa de comandos del servidor UA: comandos de punto (`.vendas`, `
 5. Si juegas en Ultima Alianza, añade también `context-pack/ua/ua-commands.md` y `context-pack/ua/ua-examples.md`
 6. A partir de ahí, la IA conoce la API completa y los comandos de UA y puede ayudarte a escribir macros correctamente
 
+## MCP Server — integración automática
+
+<p align="center">
+  <img src="mcp/mcp_IA_UA.png" alt="ClassicUO UA MCP" width="180"/>
+</p>
+
+En lugar de copiar y pegar los archivos manualmente, el **MCP server** los inyecta automáticamente en cualquier cliente IA compatible: Claude Desktop, Cursor, Windsurf, Continue...
+
+La IA tendrá disponibles los 4 recursos en cuanto arranque la sesión, sin que el usuario tenga que hacer nada más.
+
+### Descarga
+
+Descarga `classicuo-ua-mcp.exe` desde la sección [Releases](https://github.com/sirdrunk/ua-webclient-ai/releases) y ponlo en una carpeta permanente (por ejemplo `C:\UA\mcp\`).
+
+No requiere instalar Node.js ni ninguna dependencia.
+
+### Configuración
+
+#### Claude Desktop
+
+Edita `%APPDATA%\Claude\claude_desktop_config.json`:
+
+```json
+{
+  "mcpServers": {
+    "classicuo-ua": {
+      "command": "C:/UA/mcp/classicuo-ua-mcp.exe"
+    }
+  }
+}
+```
+
+#### Cursor
+
+Edita `%APPDATA%\Cursor\User\globalStorage\roamingSettings.json` o ve a *Settings → MCP*:
+
+```json
+{
+  "mcpServers": {
+    "classicuo-ua": {
+      "command": "C:/UA/mcp/classicuo-ua-mcp.exe"
+    }
+  }
+}
+```
+
+#### Windsurf
+
+Edita `%APPDATA%\Windsurf\User\globalStorage\roamingSettings.json` o ve a *Settings → MCP*:
+
+```json
+{
+  "mcpServers": {
+    "classicuo-ua": {
+      "command": "C:/UA/mcp/classicuo-ua-mcp.exe"
+    }
+  }
+}
+```
+
+> Cambia `C:/UA/mcp/classicuo-ua-mcp.exe` por la ruta donde hayas guardado el ejecutable. Usa barras `/` en lugar de `\`.
+
+### Recursos disponibles
+
+Una vez configurado, el servidor expone estos recursos que la IA puede consultar automáticamente:
+
+| URI | Contenido |
+|-----|-----------|
+| `classicuo://api` | API completa de scripting de ClassicUO |
+| `classicuo://best-practices` | Guía de buenas prácticas para macros robustos |
+| `classicuo://ua-commands` | Comandos del servidor Ultima Alianza |
+| `classicuo://ua-examples` | 12 macros reales anotados de jugadores de UA |
+
+---
+
 ## Fuente de la documentación
 
 La API está extraída de la documentación oficial de ClassicUO:

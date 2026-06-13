@@ -8,9 +8,11 @@
   },
   "scripts": {
     "build": "tsc",
-    "bundle": "esbuild src/server.ts --bundle --platform=node --target=node20 --outfile=dist/bundle.js",
+    "bundle": "node scripts/bundle.js",
     "exe": "npx @yao-pkg/pkg dist/bundle.js --targets node20-win-x64 --output bin/classicuo-ua-mcp.exe --assets \"resources/**/*\"",
-    "build:exe": "npm run build && npm run bundle && npm run exe",
+    "set-icon": "node scripts/set-icon.js",
+    "test": "node scripts/test-exe.js",
+    "build:exe": "npm run build && npm run bundle && npm run exe && npm run set-icon && npm test",
     "start": "node dist/server.js",
     "dev": "npx ts-node src/server.ts"
   },
@@ -34,6 +36,9 @@
     "@types/node": "^25.9.3",
     "@yao-pkg/pkg": "^6.14.2",
     "esbuild": "^0.28.1",
+    "png-to-ico": "^3.0.1",
+    "rcedit": "^4.0.1",
+    "resedit": "^3.0.2",
     "typescript": "^6.0.3"
   },
   "pkg": {

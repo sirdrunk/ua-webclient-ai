@@ -1,39 +1,46 @@
 #!/usr/bin/env node
 import { Server } from '@modelcontextprotocol/sdk/server/index.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
-import {
-  ListResourcesRequestSchema,
-  ReadResourceRequestSchema,
-} from '@modelcontextprotocol/sdk/types.js';
+import { ListResourcesRequestSchema, ReadResourceRequestSchema } from '@modelcontextprotocol/sdk/types.js';
 import { readFileSync } from 'fs';
 import { join } from 'path';
 
-const RESOURCES_DIR = join(__dirname, '..', 'resources');
+// Los imports de markdown son resueltos por esbuild (--loader:.md=text) al compilar el .exe.
+// En modo desarrollo (node dist/server.js), se usa readFileSync en runtime.
+declare const __API_CONTENT__: string | undefined;
+declare const __BEST_PRACTICES_CONTENT__: string | undefined;
+declare const __UA_COMMANDS_CONTENT__: string | undefined;
+declare const __UA_EXAMPLES_CONTENT__: string | undefined;
+
+function loadResource(filename: string, embedded: string | undefined): string {
+  if (embedded !== undefined) return embedded;
+  return readFileSync(join(__dirname, '..', 'resources', filename), 'utf-8');
+}
 
 const RESOURCES = [
   {
     uri: 'classicuo://api',
     name: 'ClassicUO Web Client — API de scripting',
     description: 'Referencia completa de la API global: player, client, target, journal, Gump, enumeraciones y tipos. Necesario para escribir cualquier macro.',
-    file: 'classicuo-scripting-context.md',
+    content: () => loadResource('classicuo-scripting-context.md', typeof __API_CONTENT__ !== 'undefined' ? __API_CONTENT__ : undefined),
   },
   {
     uri: 'classicuo://best-practices',
     name: 'ClassicUO Web Client — Buenas prácticas',
     description: 'Guía de patrones para macros robustos: bucles con sleep, estados bloqueantes, cliente vs servidor, timeouts, journal.clear, condiciones de salida.',
-    file: 'best-practices.md',
+    content: () => loadResource('best-practices.md', typeof __BEST_PRACTICES_CONTENT__ !== 'undefined' ? __BEST_PRACTICES_CONTENT__ : undefined),
   },
   {
     uri: 'classicuo://ua-commands',
     name: 'Ultima Alianza — Comandos del servidor',
     description: 'Comandos específicos de UA: punto (.vendas, .cast N, .vida, .nigro N...) y voz (mascotas, NPCs, barcos, casas). Incluye tabla completa de hechizos por número.',
-    file: 'ua-commands.md',
+    content: () => loadResource('ua-commands.md', typeof __UA_COMMANDS_CONTENT__ !== 'undefined' ? __UA_COMMANDS_CONTENT__ : undefined),
   },
   {
     uri: 'classicuo://ua-examples',
     name: 'Ultima Alianza — Ejemplos de macros',
     description: '12 macros reales anotados de jugadores de UA. Cubren bucle de curación, detección de estado, avisos PvP, loot, entrenamiento de skill, domado y más.',
-    file: 'ua-examples.md',
+    content: () => loadResource('ua-examples.md', typeof __UA_EXAMPLES_CONTENT__ !== 'undefined' ? __UA_EXAMPLES_CONTENT__ : undefined),
   },
 ];
 
@@ -43,31 +50,14 @@ const server = new Server(
 );
 
 server.setRequestHandler(ListResourcesRequestSchema, async () => ({
-  resources: RESOURCES.map(({ uri, name, description }) => ({
-    uri,
-    name,
-    description,
-    mimeType: 'text/markdown',
-  })),
+  resources: RESOURCES.map(({ uri, name, description }) => ({ uri, name, description, mimeType: 'text/markdown' })),
 }));
 
 server.setRequestHandler(ReadResourceRequestSchema, async (request) => {
   const resource = RESOURCES.find((r) => r.uri === request.params.uri);
-
-  if (!resource) {
-    throw new Error(`Recurso no encontrado: ${request.params.uri}`);
-  }
-
-  const content = readFileSync(join(RESOURCES_DIR, resource.file), 'utf-8');
-
+  if (!resource) throw new Error(`Recurso no encontrado: ${request.params.uri}`);
   return {
-    contents: [
-      {
-        uri: resource.uri,
-        mimeType: 'text/markdown',
-        text: content,
-      },
-    ],
+    contents: [{ uri: resource.uri, mimeType: 'text/markdown', text: resource.content() }],
   };
 });
 

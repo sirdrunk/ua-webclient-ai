@@ -208,7 +208,99 @@ while (true) {
 
 ---
 
-## 9. Incluir siempre una condicion de salida
+## 9. Intervalos de sleep recomendados segun el tipo de operacion
+
+No todas las operaciones tienen el mismo coste. Leer propiedades locales del jugador no genera trafico de red; enviar comandos al servidor si lo hace. El intervalo de sleep debe ajustarse en consecuencia.
+
+### Operaciones solo de cliente (sin trafico de red)
+
+Leer `player.hits`, `player.stamina`, `player.mana`, `player.weight`, `player.isPoisoned` y similares son accesos a variables locales del cliente. No generan ningun paquete al servidor.
+
+Lo mismo aplica a `client.findType()`, `client.findObject()` y cualquier busqueda de items — son busquedas sobre el estado local del cliente.
+
+Para bucles que solo leen estado local, un intervalo de **200–500ms** es suficiente. Menos de 200ms no aporta reactividad perceptible y consume CPU innecesariamente.
+
+```ts
+// Monitorizar estamina: solo lectura local, 500ms es mas que suficiente
+while (true) {
+  if (player.stamina < player.maxStamina * 0.30) {
+    // tomar pocion...
+  }
+  sleep(500);
+}
+```
+
+### Operaciones que generan trafico al servidor
+
+`player.say()`, `player.use()`, `player.useType()`, `player.cast()`, `player.moveItem()` y cualquier otro comando de accion envian paquetes al servidor. Ejecutarlos en un bucle sin control puede floodear la conexion.
+
+Regla practica:
+- Entre dos comandos consecutivos al servidor: minimo **500ms**, recomendado **1000ms**.
+- Nunca reintentar una accion fallida sin sleep previo.
+- Respetar los cooldowns del servidor (vendas, pociones, hechizos) usando journal para detectar el fin del cooldown en lugar de un tiempo fijo.
+
+```ts
+// MAL: reintenta usar la pocion cada 200ms si falla, floodeando el servidor
+while (true) {
+  if (player.stamina < player.maxStamina * 0.30) {
+    player.say('.energia');
+  }
+  sleep(200);
+}
+
+// BIEN: usa la pocion una vez y espera confirmacion del servidor antes de reintentar
+while (true) {
+  if (player.stamina < player.maxStamina * 0.30 && !enCooldown) {
+    player.say('.energia');
+    enCooldown = true;
+    journal.clear();
+  }
+  if (enCooldown && journal.waitForText('Ya puedes tomar pociones', undefined, 100)) {
+    enCooldown = false;
+    journal.clear();
+  }
+  sleep(500);
+}
+```
+
+### Timeout en esperas de journal
+
+`journal.waitForText` sin timeout espera indefinidamente. Si el servidor no envía el mensaje esperado — por lag, porque la acción falló, o porque el texto no coincide exactamente — la macro se queda bloqueada para siempre.
+
+Siempre pasar un timeout acorde al tiempo razonable de respuesta del servidor:
+
+- **Acciones rápidas** (pociones, usar item): 3000ms
+- **Acciones con animación** (vendas, hechizos cortos): 5000–6000ms
+- **Hechizos largos o acciones lentas**: 8000–10000ms
+
+```ts
+// MAL: si el servidor no responde, la macro se cuelga indefinidamente
+journal.waitForText('Ya puedes tomar pociones de nuevo');
+
+// BIEN: timeout de 3 segundos para una pocion
+const respondio = journal.waitForText('Ya puedes tomar pociones de nuevo', undefined, 3000);
+if (!respondio) {
+  // el servidor no confirmo — asumir cooldown expirado o accion fallida
+  enCooldown = false;
+  journal.clear();
+}
+```
+
+### Tabla de referencia rapida
+
+| Tipo de operacion | Trafico de red | Intervalo recomendado |
+|---|---|---|
+| Leer stats (`player.hits`, `player.stamina`...) | No | 200–500ms |
+| Buscar items (`client.findType`) | No | 200–500ms |
+| Leer journal (`journal.containsText`) | No | 200–500ms |
+| Esperar mensaje de servidor (`journal.waitForText`) | No | timeout 3000–8000ms según acción |
+| Usar item / dar comando (`player.say`, `player.use`) | Si | 1 vez por cooldown del servidor |
+| Lanzar hechizo (`player.cast`) | Si | 1 vez por casting time |
+| Mover items (`player.moveItem`) | Si | 500ms minimo entre movimientos |
+
+---
+
+## 10. Incluir siempre una condicion de salida
 
 Una macro sin condicion de salida ante recursos agotados entra en un bucle infinito intentando una accion imposible, generando carga innecesaria en el cliente y potencialmente en el servidor.
 
