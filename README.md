@@ -53,7 +53,7 @@ Referencia completa de comandos del servidor UA: comandos de punto (`.vendas`, `
 
 En lugar de copiar y pegar los archivos manualmente, el **MCP server** los inyecta automáticamente en cualquier cliente IA compatible: Claude Desktop, Cursor, Windsurf, Continue...
 
-La IA tendrá disponibles los 4 recursos en cuanto arranque la sesión, sin que el usuario tenga que hacer nada más.
+La IA tendrá disponibles los recursos en cuanto arranque la sesión, sin que el usuario tenga que hacer nada más.
 
 ### Instalación
 
@@ -164,6 +164,7 @@ Una vez configurado, el servidor expone estos recursos que la IA puede consultar
 | `classicuo://best-practices` | Guía de buenas prácticas para macros robustos |
 | `classicuo://ua-commands` | Comandos del servidor Ultima Alianza |
 | `classicuo://ua-examples` | 12 macros reales anotados de jugadores de UA |
+| `classicuo://ua-npcs` | 497 NPCs del servidor con gráfico, hex y decimal *(próximamente en v1.1.0)* |
 
 ---
 
@@ -174,7 +175,7 @@ La API está extraída de la documentación oficial de ClassicUO:
 - Web: https://www.classicuo.org/scripting/
 - GitHub: https://github.com/ClassicUO/classicuo-web/tree/main/site/scripting
 
-Última actualización del context pack: **2026-06-12**
+Última actualización: **2026-06-13**
 
 ---
 
