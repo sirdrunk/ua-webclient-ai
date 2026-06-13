@@ -300,7 +300,164 @@ if (!respondio) {
 
 ---
 
-## 10. Incluir siempre una condicion de salida
+## 10. No iterar findType sobre un array de graficos
+
+Cada llamada a `client.findType` sin `sourceSerial` hace un scan completo de todos los objetos visibles en pantalla: suelo, contenedores abiertos, jugadores cercanos. Si se itera sobre un array de graficos llamando `findType` por cada uno, se realizan N scans completos por iteracion. En zonas concurridas o con mucho loot en el suelo, esto genera lag de cliente visible.
+
+```ts
+// MAL: un scan completo del mundo por cada grafico en la lista
+const lootList = [0x13C7, 0x13D3, 0xF3F, 0x1B72, 0x1B74];
+while (true) {
+  for (const graphic of lootList) {
+    const item = client.findType(graphic); // scan completo de todo lo visible, cada vez
+    if (item) {
+      player.moveItem(item, player.backpack);
+      sleep(600);
+    }
+  }
+  sleep(300);
+}
+```
+
+En su lugar, acotar siempre la busqueda a un contenedor concreto (`sourceSerial`). Si hay que buscar multiples tipos, usar `findAllItemsOfType` para cada uno o reducir la frecuencia del bucle:
+
+```ts
+// BIEN: busqueda acotada al cadaver o a la mochila, no al mundo
+const lootList = [0x13C7, 0x13D3, 0xF3F, 0x1B72, 0x1B74];
+while (true) {
+  const cadaver = client.findType(0x2006); // buscar cadaver una sola vez por iteracion
+  if (cadaver) {
+    for (const graphic of lootList) {
+      const item = client.findType(graphic, null, cadaver); // acotado al cadaver
+      if (item) {
+        player.moveItem(item, player.backpack);
+        sleep(600);
+      }
+    }
+  }
+  sleep(500);
+}
+```
+
+Si no hay forma de acotar la busqueda a un contenedor — por ejemplo, macros de PvP que eliminan items tirados en el suelo para desbloquear el paso durante una persecucion — el scan frecuente es intencionado y necesario. Aumentar el sleep destruiria la utilidad de la macro. En ese caso, el objetivo es minimizar el coste de cada scan en lugar de reducir la frecuencia:
+
+**1. Limitar el rango de busqueda** con el parametro `range`. Solo importan los items en los 2–3 tiles inmediatos alrededor del jugador:
+
+```ts
+const RANGE = 2; // solo los tiles inmediatamente alrededor del jugador
+while (true) {
+  for (const graphic of bloqueadores) {
+    // range=2 escanea solo los objetos mas proximos, no toda la pantalla
+    const item = client.findType(graphic, null, null, null, RANGE);
+    if (item) {
+      player.moveItem(item, player.backpack);
+      sleep(300);
+    }
+  }
+  sleep(100);
+}
+```
+
+**2. Buscar solo los graficos concretos** de los items usados como muro. No buscar todos los items del suelo, sino unicamente los tipos especificos que se usan como bloqueadores (muebles, objetos grandes).
+
+**3. Usar `ignoreList`** para no reprocesar items que ya se intentaron mover y fallaron:
+
+```ts
+while (true) {
+  for (const graphic of bloqueadores) {
+    const item = client.findType(graphic, null, null, null, RANGE);
+    if (item) {
+      const moved = player.moveItem(item, player.backpack);
+      if (!moved) ignoreList.add(item.serial); // no reintentar este item
+      sleep(300);
+    }
+  }
+  sleep(100);
+}
+```
+
+**4. Filtrar por direccion del jugador.** Los items bloqueantes se tiran delante de quien huye, no detras. Escanear solo el semicirculo frontal usando `player.direction` y las coordenadas del item reduce a la mitad los items a procesar:
+
+```ts
+function estaEnFrente(item: Item): boolean {
+  const dx = item.x - player.x;
+  const dy = item.y - player.y;
+  switch (player.direction) {
+    case Directions.North: return dy <= 0;
+    case Directions.South: return dy >= 0;
+    case Directions.East:  return dx >= 0;
+    case Directions.West:  return dx <= 0;
+    case Directions.Right: return dx >= 0 && dy <= 0; // NE
+    case Directions.Down:  return dx >= 0 && dy >= 0; // SE
+    case Directions.Left:  return dx <= 0 && dy >= 0; // SW
+    case Directions.Up:    return dx <= 0 && dy <= 0; // NW
+    default: return true;
+  }
+}
+```
+
+**5. Activar por pulso de tecla en lugar de bucle continuo.** El patron mas eficiente para macros de combate intensivo es no usar `while(true)` permanente sino activar la macro con una tecla que ejecuta el scan durante un tiempo limitado y luego termina. Carga cero cuando no hay combate, reaccion maxima cuando se necesita:
+
+```ts
+// Macro asignada a una tecla — se ejecuta una vez por pulsacion
+// Escanea y limpia el area durante 1 segundo, luego termina
+const DURACION_MS = 1000;
+const inicio = Date.now();
+
+while (Date.now() - inicio < DURACION_MS) {
+  for (const graphic of bloqueadores) {
+    const items = client.findAllItemsOfType(graphic, null, null, null, RANGE);
+    for (const item of items.filter(estaEnFrente)) {
+      player.moveItem(item, player.backpack);
+      sleep(300);
+    }
+  }
+  sleep(100);
+}
+// La macro termina sola — el jugador pulsa la tecla cada vez que necesita limpiar el paso
+```
+
+**Limitacion conocida de la API:** no existe un metodo para obtener todos los items en un radio sin especificar grafico. El patron optimo seria un unico scan (`findAllItemsInRange`) seguido de filtrado por grafico y direccion en JS, pero la API actual requiere una llamada por cada grafico de la lista. Con listas largas de tipos de muebles esto genera N scans por iteracion — coste inevitable con las herramientas disponibles.
+
+---
+
+## 11. Verificar el exito de una transferencia de items por peso
+
+Las macros que mueven items al inventario (reponer pociones, recoger recursos de mineria, talar, recoger materiales de craft) no siempre pueden confirmar el exito por journal — el servidor no siempre emite un mensaje claro o el texto puede variar. Una forma fiable y sin trafico de red es comparar `player.weight` antes y despues de la operacion: si el peso aumento, los items llegaron; si no cambio, la operacion fallo.
+
+```ts
+const pesoAntes = player.weight;
+
+// operacion de transferencia
+player.say('.reponerpociones'); // o moveItem, o cualquier accion que añada items
+sleep(1000); // dar tiempo al servidor para procesar y actualizar el inventario
+
+const pesoDespues = player.weight;
+
+if (pesoDespues > pesoAntes) {
+  client.headMsg('Reposicion OK', player, 68); // verde
+} else {
+  client.headMsg('Fallo al reponer — revisar inventario', player, 38); // rojo
+}
+```
+
+Este patron es aplicable a cualquier macro que añada items al inventario:
+
+| Tipo de macro | Lo que se transfiere |
+|---|---|
+| Reponer pociones | Pociones de vida, mana, stamina |
+| Mineria | Lingotes, minerales |
+| Tala | Troncos, madera |
+| Craft | Materiales recogidos de un contenedor |
+| Loot | Items de un cadaver |
+
+`player.weight` es una lectura local — no genera trafico de red — por lo que comparar antes y despues no tiene ningun coste adicional.
+
+**Nota:** dar siempre un `sleep` suficiente entre la accion y la lectura del peso final. El servidor necesita tiempo para procesar la transferencia y actualizar el estado del cliente. Un minimo de 500ms para transferencias locales; 1000–1500ms si hay lag o si la accion depende del servidor.
+
+---
+
+## 12. Incluir siempre una condicion de salida
 
 Una macro sin condicion de salida ante recursos agotados entra en un bucle infinito intentando una accion imposible, generando carga innecesaria en el cliente y potencialmente en el servidor.
 
