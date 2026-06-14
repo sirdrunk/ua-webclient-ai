@@ -73,6 +73,8 @@ setTimeout(() => {
     { text: 'Gallina',                                desc: 'Contenido de classicuo://ua-npcs embebido' },
     { text: 'ITEMS - HERRERIA',                       desc: 'Contenido de classicuo://ua-crafting-items embebido' },
     { text: 'color_o_valorite',                       desc: 'Contenido de classicuo://ua-colors embebido' },
+    { text: 'color_dragones',                          desc: 'Slayers embebidos en classicuo://ua-colors' },
+    { text: 'tub_b1',                                  desc: 'TUB embebidos en classicuo://ua-colors' },
   ];
 
   console.log('\n── Validación del .exe ──');
