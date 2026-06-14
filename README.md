@@ -172,6 +172,7 @@ Una vez configurado, el servidor expone estos recursos que la IA puede consultar
 
 | MCP server | Context pack |
 |------------|-------------|
+| `mcp-v1.2.0` | `context-pack_ua-resources-v1.5.0` |
 | `mcp-v1.1.0` | `context-pack_ua-resources-v1.4.0` |
 | `mcp-v1.0.0` | `context-pack_ua-resources-v1.3.0` |
 
