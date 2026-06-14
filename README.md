@@ -168,6 +168,13 @@ Una vez configurado, el servidor expone estos recursos que la IA puede consultar
 | `classicuo://ua-crafting-items` | Items crafteables con gráfico y hue: herrería, sastrería, alquimia, pociones, reagentes, armaduras de escamas y más |
 | `classicuo://ua-colors` | Hues de referencia: metales/ores, armas slayer y tintes de temporada |
 
+### Compatibilidad MCP ↔ Context pack
+
+| MCP server | Context pack |
+|------------|-------------|
+| `mcp-v1.1.0` | `context-pack_ua-resources-v1.4.0` |
+| `mcp-v1.0.0` | `context-pack_ua-resources-v1.3.0` |
+
 ---
 
 ## Fuente de la documentación
@@ -177,7 +184,7 @@ La API está extraída de la documentación oficial de ClassicUO:
 - Web: https://www.classicuo.org/scripting/
 - GitHub: https://github.com/ClassicUO/classicuo-web/tree/main/site/scripting
 
-Última actualización: **2026-06-13**
+Última actualización: **2026-06-14**
 
 ---
 
